@@ -9,6 +9,7 @@
         public int Score { get; private set; }
         public bool GameOver { get; private set; }
 
+        private readonly LinkedList<Direction> _dirChanges = new();
         private readonly LinkedList<Position> _snakePositions = new();
         private readonly Random _random = new Random();
 
@@ -75,9 +76,29 @@
             _snakePositions.RemoveLast();
         }
 
+        private Direction GetLastDirection()
+        {
+            if (_dirChanges.Count == 0)
+                return Dir;
+
+            return _dirChanges.Last.Value;
+        }
+
+        private bool CanChangeDir(Direction newDir)
+        {
+            if (_dirChanges.Count == 2)
+                return false;
+
+            Direction lastDir = GetLastDirection();
+            return newDir != lastDir && newDir != lastDir.Opposite();
+        }
+
         public void ChangeDirection(Direction dir)
         {
-            Dir = dir;
+            if (CanChangeDir(dir))
+            {
+                _dirChanges.AddLast(dir);
+            }
         }
 
         private bool OutsideGrid(Position pos) => pos.Row < 0 || pos.Row >= Rows || pos.Col < 0 || pos.Col >= Cols;
@@ -95,6 +116,12 @@
 
         public void Move()
         {
+            if (_dirChanges.Count > 0)
+            {
+                Dir = _dirChanges.First.Value;
+                _dirChanges.RemoveFirst();
+            }
+
             Position newHeadPos = HeadPosition().Translate(Dir);
             GridValue hit = WillHit(newHeadPos);
 
