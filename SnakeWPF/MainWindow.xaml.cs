@@ -166,7 +166,7 @@ namespace SnakeWPF
                 Position pos = positions[i];
                 ImageSource source = (i == 0) ? Images.DeadHead : Images.DeadBody;
                 _gridImages[pos.Row, pos.Col].Source = source;
-                await Task.Delay(200);
+                await Task.Delay(50);
             }
         }
 
